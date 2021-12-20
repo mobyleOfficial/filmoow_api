@@ -17,15 +17,11 @@ class ContentRepository {
         val actorList = mutableListOf<Actor>()
         val recommendedMovieList = mutableListOf<RecommendedContent>()
 
-        Thread.sleep(2_000)
-
         val webPageMovie = Jsoup.connect("${BASE_URL}/$id")
             .cookie(
                 "filmow_sessionid",
                 ".eJxVy0EOwiAQQNG7sDYEcGgZly68BqEzTGjUNpESF8a7t5oudP3-f6mY2lJiq_kRS6pFnZQQQhcCWGGT0Xt2ho5mCD1TZ8FxQGFB8OrwO4-8rQ5s6BH_ZUh0zdOHZbzd56dORHOblqp3qfryhfMevlcI3zGW:1mw25k:pQyIaZchZU7SZZTMxn0X6v3bJ0c"
             )
-            .header("Cache-control", "no-cache")
-            .header("Cache-store", "no-store")
             .get()
 
         try {
