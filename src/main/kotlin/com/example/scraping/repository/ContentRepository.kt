@@ -1,23 +1,17 @@
 package com.example.scraping.repository
 
-import com.example.scraping.repository.model.Actor
-import com.example.scraping.repository.model.BASE_URL
-import com.example.scraping.repository.model.Director
-import com.example.scraping.repository.model.SeenStatus
+import com.example.scraping.repository.model.*
 import com.example.scraping.repository.model.content_detail.ContentDetail
 import com.example.scraping.repository.model.content_detail.RecommendedContent
 import org.jsoup.Jsoup
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 
 class ContentRepository {
-    fun getMovieDetail(id: String): ContentDetail {
+    fun getMovieDetail(id: String): ResponseEntity<Any> {
         val coverList = mutableListOf<String>()
         val directorList = mutableListOf<Director>()
         val actorList = mutableListOf<Actor>()
@@ -30,8 +24,8 @@ class ContentRepository {
                 "filmow_sessionid",
                 ".eJxVy0EOwiAQQNG7sDYEcGgZly68BqEzTGjUNpESF8a7t5oudP3-f6mY2lJiq_kRS6pFnZQQQhcCWGGT0Xt2ho5mCD1TZ8FxQGFB8OrwO4-8rQ5s6BH_ZUh0zdOHZbzd56dORHOblqp3qfryhfMevlcI3zGW:1mw25k:pQyIaZchZU7SZZTMxn0X6v3bJ0c"
             )
-            .header("Cache-control","no-cache")
-            .header("Cache-store","no-store")
+            .header("Cache-control", "no-cache")
+            .header("Cache-store", "no-store")
             .get()
 
         try {
@@ -176,9 +170,8 @@ class ContentRepository {
                     .getElementsByTag("li")
 
                 addActorsToList(actorList, actorsListItem)
-            } catch (error: Exception) {
-                // do something
-                print(error)
+            } catch (exception: Exception) {
+                print(exception.message)
             }
         }
 
@@ -212,7 +205,7 @@ class ContentRepository {
             }
 
         } catch (exception: Exception) {
-            print(exception.toString());
+            print(exception.toString())
         }
 
         val seenStatus: SeenStatus = try {
@@ -242,21 +235,31 @@ class ContentRepository {
             SeenStatus.NotSeen
         }
 
-        return ContentDetail(
-            title,
-            originalTitle,
-            description,
-            generalScore?.toDouble(),
-            userScore?.toDouble(),
-            scoreQuantity?.toInt(),
-            classification,
-            duration,
-            releaseYear,
-            seenStatus,
-            genreList,
-            coverList,
-            actorList,
-            recommendedMovieList,
+        if (title.isNullOrEmpty()) {
+            return ResponseEntity(
+                ErrorMessage("Not found", "Content detail not found"),
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            ContentDetail(
+                title,
+                originalTitle,
+                description,
+                generalScore?.toDouble(),
+                userScore?.toDouble(),
+                scoreQuantity?.toInt(),
+                classification,
+                duration,
+                releaseYear,
+                seenStatus,
+                genreList,
+                coverList,
+                actorList,
+                recommendedMovieList,
+            ),
+            HttpStatus.OK
         )
     }
 
@@ -270,10 +273,10 @@ class ContentRepository {
         }
     }
 
-    fun changeContentSeenStatus(id: String, status: String): SeenStatus {
+    fun changeContentSeenStatus(id: String, status: String): ResponseEntity<Any> {
         try {
             val headers = HttpHeaders()
-            headers.contentType = MediaType.APPLICATION_FORM_URLENCODED;
+            headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
             headers.add(
                 "Cookie",
                 "filmow_sessionid=.eJxVy0EOwiAQQNG7sDYEcGgZly68BqEzTGjUNpESF8a7t5oudP3-f6mY2lJiq_kRS6pFnZQQQhcCWGGT0Xt2ho5mCD1TZ8FxQGFB8OrwO4-8rQ5s6BH_ZUh0zdOHZbzd56dORHOblqp3qfryhfMevlcI3zGW:1mw25k:pQyIaZchZU7SZZTMxn0X6v3bJ0c"
@@ -296,22 +299,27 @@ class ContentRepository {
                 entity,
                 String::class.java,
             )
-            val responseText  = response.headers["set-cookie"]?.get(0) ?: ""
+            val responseText = response.headers["set-cookie"]?.get(0) ?: ""
             val isReturnStatusNotSeen = responseText.contains("Removido com sucesso")
 
-            return if(isReturnStatusNotSeen) {
+            val seenStatus = if (isReturnStatusNotSeen) {
                 SeenStatus.NotSeen
-            } else if(!isReturnStatusNotSeen && status == "WS") {
+            } else if (!isReturnStatusNotSeen && status == "WS") {
                 SeenStatus.WantToSee
             } else {
                 SeenStatus.Seen
             }
 
+            return ResponseEntity(
+                seenStatus,
+                HttpStatus.OK
+            )
         } catch (exception: Exception) {
-            print(exception)
+            return ResponseEntity(
+                ErrorMessage("BAD REQUEST", "Could not change status"),
+                HttpStatus.BAD_REQUEST
+            )
         }
-
-        return SeenStatus.NotSeen
     }
 }
 

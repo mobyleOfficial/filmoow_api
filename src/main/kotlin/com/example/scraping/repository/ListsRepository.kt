@@ -5,9 +5,11 @@ import com.example.scraping.repository.model.BASE_URL
 import com.example.scraping.repository.model.user_listing.ListStats
 import com.example.scraping.repository.model.user_listing.UserListing
 import org.jsoup.Jsoup
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 class ListsRepository {
-    fun getPopularLists(page: Int): List<UserListing> {
+    fun getPopularLists(page: Int): ResponseEntity<List<UserListing>> {
         val userListsList = mutableListOf<UserListing>()
         val webPage = Jsoup.connect("$BASE_URL/listas-populares/?pagina=$page")
             .get()
@@ -46,10 +48,20 @@ class ListsRepository {
             )
         }
 
-        return userListsList
+        if(userListsList.isEmpty()) {
+            return ResponseEntity(
+                userListsList,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            userListsList,
+            HttpStatus.OK
+        )
     }
 
-    fun getWeekPopularList(): List<UserListing> {
+    fun getWeekPopularList(): ResponseEntity<List<UserListing>> {
         val userListsList = mutableListOf<UserListing>()
         val webPage = Jsoup.connect("https://filmow.com")
             .get()
@@ -102,6 +114,16 @@ class ListsRepository {
             )
         }
 
-        return userListsList
+        if(userListsList.isEmpty()) {
+            return ResponseEntity(
+                userListsList,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            userListsList,
+            HttpStatus.OK
+        )
     }
 }

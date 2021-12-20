@@ -4,9 +4,11 @@ import com.example.scraping.repository.mappers.statsToInt
 import com.example.scraping.repository.model.Movie
 import com.example.scraping.repository.model.BASE_URL
 import org.jsoup.Jsoup
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 class MovieRepository {
-    fun getPopularMovies(page: Int): List<Movie> {
+    fun getPopularMovies(page: Int): ResponseEntity<List<Movie>> {
         val movieList = mutableListOf<Movie>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/populares/filmes/?page=$page")
             .get()
@@ -28,16 +30,26 @@ class MovieRepository {
             movieList.add(Movie(id, title, image, score, commentsQuantity))
         }
 
-        return movieList
+        if(movieList.isEmpty()) {
+            return ResponseEntity(
+                movieList,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            movieList,
+            HttpStatus.OK
+        )
     }
 
-    fun getAvailableMovies(): List<Movie> = getMovieList("filmes-nos-cinemas")
+    fun getAvailableMovies(): ResponseEntity<List<Movie>> = getMovieList("filmes-nos-cinemas")
 
-    fun getMoviesComingSoon(): List<Movie> = getMovieList("filmes-em-breve")
+    fun getMoviesComingSoon(): ResponseEntity<List<Movie>> = getMovieList("filmes-em-breve")
 
-    fun getMoviesWeekPremiere(): List<Movie> = getMovieList("filmes-estreias")
+    fun getMoviesWeekPremiere(): ResponseEntity<List<Movie>> = getMovieList("filmes-estreias")
 
-    private fun getMovieList(page: String): List<Movie> {
+    private fun getMovieList(page: String): ResponseEntity<List<Movie>> {
         val movieList = mutableListOf<Movie>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/$page")
             .get()
@@ -59,7 +71,17 @@ class MovieRepository {
             movieList.add(Movie(id, title, image, score, commentsQuantity))
         }
 
-        return movieList
+        if(movieList.isEmpty()) {
+            return ResponseEntity(
+                movieList,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            movieList,
+            HttpStatus.OK
+        )
     }
 }
 

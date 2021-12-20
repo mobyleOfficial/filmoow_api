@@ -4,9 +4,11 @@ import com.example.scraping.repository.model.BASE_URL
 import com.example.scraping.repository.model.news.News
 import com.example.scraping.repository.model.news.NewsStats
 import org.jsoup.Jsoup
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 class NewsRepository {
-    fun getLastNews(page: Int): List<News> {
+    fun getLastNews(page: Int): ResponseEntity<List<News>> {
         val newsList = mutableListOf<News>()
         val webPage = Jsoup.connect("$BASE_URL/noticias/?pagina=$page")
             .get()
@@ -59,6 +61,16 @@ class NewsRepository {
             )
         }
 
-        return newsList
+        if (newsList.isEmpty()) {
+            return ResponseEntity(
+                newsList,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            newsList,
+            HttpStatus.OK
+        )
     }
 }

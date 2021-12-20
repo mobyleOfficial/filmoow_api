@@ -1,12 +1,14 @@
 package com.example.scraping.repository
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.Series
 import com.example.scraping.repository.model.BASE_URL
+import com.example.scraping.repository.model.Series
 import org.jsoup.Jsoup
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 class SeriesRepository {
-    fun getPopularSeries(page: Int): List<Series> {
+    fun getPopularSeries(page: Int): ResponseEntity<List<Series>> {
         val seriesList = mutableListOf<Series>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/populares/series/?pagina=$page")
             .get()
@@ -35,6 +37,16 @@ class SeriesRepository {
             seriesList.add(Series(id, title, image, score, commentQuantity))
         }
 
-        return seriesList
+        if (seriesList.isEmpty()) {
+            return ResponseEntity(
+                seriesList,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            seriesList,
+            HttpStatus.OK
+        )
     }
 }

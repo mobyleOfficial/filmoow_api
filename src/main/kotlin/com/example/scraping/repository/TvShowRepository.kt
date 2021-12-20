@@ -1,12 +1,14 @@
 package com.example.scraping.repository
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.TvShow
 import com.example.scraping.repository.model.BASE_URL
+import com.example.scraping.repository.model.TvShow
 import org.jsoup.Jsoup
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 class TvShowRepository {
-    fun getPopularTvShow(page: Int) : List<TvShow> {
+    fun getPopularTvShow(page: Int): ResponseEntity<List<TvShow>> {
         val tvShow = mutableListOf<TvShow>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/populares/tv/?pagina=$page")
             .get()
@@ -35,6 +37,16 @@ class TvShowRepository {
             tvShow.add(TvShow(id, title, image, score, commentQuantity))
         }
 
-        return tvShow
+        if(tvShow.isEmpty()) {
+            return ResponseEntity(
+                tvShow,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+        return ResponseEntity(
+            tvShow,
+            HttpStatus.OK
+        )
     }
 }
