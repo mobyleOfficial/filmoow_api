@@ -1,14 +1,16 @@
-package com.example.scraping.repository
+package com.example.scraping.repository.movie
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.Movie
 import com.example.scraping.repository.model.BASE_URL
+import com.example.scraping.repository.model.Movie
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Component
 
-class MovieRepository {
-    fun getPopularMovies(page: Int): ResponseEntity<List<Movie>> {
+@Component
+class MovieRepositoryImpl : MovieRepository {
+    override fun getPopularMovies(page: Int): ResponseEntity<List<Movie>> {
         val movieList = mutableListOf<Movie>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/populares/filmes/?page=$page")
             .get()
@@ -30,7 +32,7 @@ class MovieRepository {
             movieList.add(Movie(id, title, image, score, commentsQuantity))
         }
 
-        if(movieList.isEmpty()) {
+        if (movieList.isEmpty()) {
             return ResponseEntity(
                 movieList,
                 HttpStatus.NOT_FOUND
@@ -43,11 +45,11 @@ class MovieRepository {
         )
     }
 
-    fun getAvailableMovies(): ResponseEntity<List<Movie>> = getMovieList("filmes-nos-cinemas")
+    override fun getAvailableMovies(): ResponseEntity<List<Movie>> = getMovieList("filmes-nos-cinemas")
 
-    fun getMoviesComingSoon(): ResponseEntity<List<Movie>> = getMovieList("filmes-em-breve")
+    override fun getMoviesComingSoon(): ResponseEntity<List<Movie>> = getMovieList("filmes-em-breve")
 
-    fun getMoviesWeekPremiere(): ResponseEntity<List<Movie>> = getMovieList("filmes-estreias")
+    override fun getMoviesWeekPremiere(): ResponseEntity<List<Movie>> = getMovieList("filmes-estreias")
 
     private fun getMovieList(page: String): ResponseEntity<List<Movie>> {
         val movieList = mutableListOf<Movie>()
@@ -71,7 +73,7 @@ class MovieRepository {
             movieList.add(Movie(id, title, image, score, commentsQuantity))
         }
 
-        if(movieList.isEmpty()) {
+        if (movieList.isEmpty()) {
             return ResponseEntity(
                 movieList,
                 HttpStatus.NOT_FOUND

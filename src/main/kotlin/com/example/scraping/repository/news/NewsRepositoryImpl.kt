@@ -1,4 +1,4 @@
-package com.example.scraping.repository
+package com.example.scraping.repository.news
 
 import com.example.scraping.repository.model.BASE_URL
 import com.example.scraping.repository.model.news.News
@@ -6,9 +6,11 @@ import com.example.scraping.repository.model.news.NewsStats
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Component
 
-class NewsRepository {
-    fun getLastNews(page: Int): ResponseEntity<List<News>> {
+@Component
+class NewsRepositoryImpl : NewsRepository {
+    override fun getLastNews(page: Int): ResponseEntity<List<News>> {
         val newsList = mutableListOf<News>()
         val webPage = Jsoup.connect("$BASE_URL/noticias/?pagina=$page")
             .get()

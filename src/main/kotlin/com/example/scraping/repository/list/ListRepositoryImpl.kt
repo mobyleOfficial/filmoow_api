@@ -1,4 +1,4 @@
-package com.example.scraping.repository
+package com.example.scraping.repository.list
 
 import com.example.scraping.repository.mappers.statsToInt
 import com.example.scraping.repository.model.BASE_URL
@@ -7,9 +7,11 @@ import com.example.scraping.repository.model.user_listing.UserListing
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Component
 
-class ListsRepository {
-    fun getPopularLists(page: Int): ResponseEntity<List<UserListing>> {
+@Component
+class ListRepositoryImpl : ListRepository {
+    override fun getPopularLists(page: Int): ResponseEntity<List<UserListing>> {
         val userListsList = mutableListOf<UserListing>()
         val webPage = Jsoup.connect("$BASE_URL/listas-populares/?pagina=$page")
             .get()
@@ -48,7 +50,7 @@ class ListsRepository {
             )
         }
 
-        if(userListsList.isEmpty()) {
+        if (userListsList.isEmpty()) {
             return ResponseEntity(
                 userListsList,
                 HttpStatus.NOT_FOUND
@@ -61,7 +63,7 @@ class ListsRepository {
         )
     }
 
-    fun getWeekPopularList(): ResponseEntity<List<UserListing>> {
+    override fun getWeekPopularList(): ResponseEntity<List<UserListing>> {
         val userListsList = mutableListOf<UserListing>()
         val webPage = Jsoup.connect("https://filmow.com")
             .get()
@@ -114,7 +116,7 @@ class ListsRepository {
             )
         }
 
-        if(userListsList.isEmpty()) {
+        if (userListsList.isEmpty()) {
             return ResponseEntity(
                 userListsList,
                 HttpStatus.NOT_FOUND

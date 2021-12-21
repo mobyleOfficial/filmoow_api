@@ -1,4 +1,4 @@
-package com.example.scraping.repository
+package com.example.scraping.repository.series
 
 import com.example.scraping.repository.mappers.statsToInt
 import com.example.scraping.repository.model.BASE_URL
@@ -6,9 +6,11 @@ import com.example.scraping.repository.model.Series
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Component
 
-class SeriesRepository {
-    fun getPopularSeries(page: Int): ResponseEntity<List<Series>> {
+@Component
+class SeriesRepositoryImpl : SeriesRepository {
+    override fun getPopularSeries(page: Int): ResponseEntity<List<Series>> {
         val seriesList = mutableListOf<Series>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/populares/series/?pagina=$page")
             .get()

@@ -1,6 +1,11 @@
 package com.example.scraping.controller
 
-import com.example.scraping.repository.*
+import com.example.scraping.repository.list.ListRepositoryImpl
+import com.example.scraping.repository.movie.MovieRepositoryImpl
+import com.example.scraping.repository.news.NewsRepositoryImpl
+import com.example.scraping.repository.series.SeriesRepositoryImpl
+import com.example.scraping.repository.tvShow.TvShowRepositoryImpl
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -8,37 +13,42 @@ import org.springframework.web.bind.annotation.RestController
 @RestController()
 @RequestMapping(value = ["/home"])
 class HomeController {
-    val movieRepository: MovieRepository = MovieRepository()
+    @Autowired
+    lateinit var movieRepositoryImpl: MovieRepositoryImpl
 
-    val seriesRepository: SeriesRepository = SeriesRepository()
+    @Autowired
+    lateinit var  seriesRepositoryImpl: SeriesRepositoryImpl
 
-    val tvShowRepository: TvShowRepository = TvShowRepository()
+    @Autowired
+    lateinit var  tvShowRepositoryImpl: TvShowRepositoryImpl
 
-    val listRepository: ListsRepository = ListsRepository()
+    @Autowired
+    lateinit var  listRepositoryImpl: ListRepositoryImpl
 
-    val newsRepository: NewsRepository = NewsRepository()
+    @Autowired
+    lateinit var  newsRepositoryImpl: NewsRepositoryImpl
 
     @GetMapping(value = ["/popularMovies"])
-    fun getPopularMovies() = movieRepository.getPopularMovies(1)
+    fun getPopularMovies() = movieRepositoryImpl.getPopularMovies(1)
 
     @GetMapping(value = ["/popularSeries"])
-    fun getPopularSeries() = seriesRepository.getPopularSeries(1)
+    fun getPopularSeries() = seriesRepositoryImpl.getPopularSeries(1)
 
     @GetMapping(value = ["/popularTvShow"])
-    fun getPopularTvShow() = tvShowRepository.getPopularTvShow(1)
+    fun getPopularTvShow() = tvShowRepositoryImpl.getPopularTvShow(1)
 
     @GetMapping(value = ["/availableCinemaMovies"])
-    fun getAvailableMovies() = movieRepository.getAvailableMovies()
+    fun getAvailableMovies() = movieRepositoryImpl.getAvailableMovies()
 
     @GetMapping(value = ["/comingSoonMovies"])
-    fun getMoviesComingSoon() = movieRepository.getMoviesComingSoon()
+    fun getMoviesComingSoon() = movieRepositoryImpl.getMoviesComingSoon()
 
     @GetMapping(value = ["/moviesWeekPremiere"])
-    fun getMoviesWeekPremiere() = movieRepository.getMoviesWeekPremiere()
+    fun getMoviesWeekPremiere() = movieRepositoryImpl.getMoviesWeekPremiere()
 
     @GetMapping(value = ["/popularLists"])
-    fun getPopularLists() = listRepository.getWeekPopularList()
+    fun getPopularLists() = listRepositoryImpl.getWeekPopularList()
 
     @GetMapping(value = ["/news"])
-    fun getNews() = newsRepository.getLastNews(1)
+    fun getNews() = newsRepositoryImpl.getLastNews(1)
 }

@@ -1,4 +1,4 @@
-package com.example.scraping.repository
+package com.example.scraping.repository.content
 
 import com.example.scraping.repository.model.*
 import com.example.scraping.repository.model.content_detail.ContentDetail
@@ -6,12 +6,15 @@ import com.example.scraping.repository.model.content_detail.RecommendedContent
 import org.jsoup.Jsoup
 import org.springframework.http.*
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 
-class ContentRepository {
-    fun getMovieDetail(id: String): ResponseEntity<Any> {
+@Component
+class ContentRepositoryImpl : ContentRepository {
+
+    override fun getMovieDetail(id: String): ResponseEntity<Any> {
         val coverList = mutableListOf<String>()
         val directorList = mutableListOf<Director>()
         val actorList = mutableListOf<Actor>()
@@ -269,7 +272,7 @@ class ContentRepository {
         }
     }
 
-    fun changeContentSeenStatus(id: String, status: String): ResponseEntity<Any> {
+    override fun changeContentSeenStatus(id: String, status: String): ResponseEntity<Any> {
         try {
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
