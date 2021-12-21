@@ -1,8 +1,8 @@
 package com.example.scraping.repository.series
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.BASE_URL
-import com.example.scraping.repository.model.Series
+import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.series.model.Series
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

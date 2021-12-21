@@ -1,8 +1,11 @@
 package com.example.scraping.repository.content
 
-import com.example.scraping.repository.model.*
-import com.example.scraping.repository.model.content_detail.ContentDetail
-import com.example.scraping.repository.model.content_detail.RecommendedContent
+import com.example.scraping.repository.content.model.Actor
+import com.example.scraping.repository.common.*
+import com.example.scraping.repository.common.model.SeenStatus
+import com.example.scraping.repository.content.model.ContentDetail
+import com.example.scraping.repository.content.model.Director
+import com.example.scraping.repository.content.model.RecommendedContent
 import org.jsoup.Jsoup
 import org.springframework.http.*
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -14,7 +17,7 @@ import org.springframework.web.client.RestTemplate
 @Component
 class ContentRepositoryImpl : ContentRepository {
 
-    override fun getMovieDetail(id: String): ResponseEntity<Any> {
+    override fun getMovieDetail(token: String, id: String): ResponseEntity<Any> {
         val coverList = mutableListOf<String>()
         val directorList = mutableListOf<Director>()
         val actorList = mutableListOf<Actor>()
@@ -23,7 +26,7 @@ class ContentRepositoryImpl : ContentRepository {
         val webPageMovie = Jsoup.connect("${BASE_URL}/$id")
             .cookie(
                 "filmow_sessionid",
-                ".eJxVy0EOwiAQQNG7sDYEcGgZly68BqEzTGjUNpESF8a7t5oudP3-f6mY2lJiq_kRS6pFnZQQQhcCWGGT0Xt2ho5mCD1TZ8FxQGFB8OrwO4-8rQ5s6BH_ZUh0zdOHZbzd56dORHOblqp3qfryhfMevlcI3zGW:1mw25k:pQyIaZchZU7SZZTMxn0X6v3bJ0c"
+                token
             )
             .get()
 
@@ -272,13 +275,13 @@ class ContentRepositoryImpl : ContentRepository {
         }
     }
 
-    override fun changeContentSeenStatus(id: String, status: String): ResponseEntity<Any> {
+    override fun changeContentSeenStatus(token: String, id: String, status: String): ResponseEntity<Any> {
         try {
             val headers = HttpHeaders()
             headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
             headers.add(
                 "Cookie",
-                "filmow_sessionid=.eJxVy0EOwiAQQNG7sDYEcGgZly68BqEzTGjUNpESF8a7t5oudP3-f6mY2lJiq_kRS6pFnZQQQhcCWGGT0Xt2ho5mCD1TZ8FxQGFB8OrwO4-8rQ5s6BH_ZUh0zdOHZbzd56dORHOblqp3qfryhfMevlcI3zGW:1mw25k:pQyIaZchZU7SZZTMxn0X6v3bJ0c"
+                "filmow_sessionid=$token"
             )
 
             val restTemplate = RestTemplate()

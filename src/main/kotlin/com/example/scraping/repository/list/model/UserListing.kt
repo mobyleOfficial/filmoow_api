@@ -1,4 +1,4 @@
-package com.example.scraping.repository.model.user_listing
+package com.example.scraping.repository.list.model
 
 data class UserListing(
     val id: String,

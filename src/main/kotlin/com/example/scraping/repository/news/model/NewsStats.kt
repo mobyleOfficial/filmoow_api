@@ -1,4 +1,4 @@
-package com.example.scraping.repository.model.news
+package com.example.scraping.repository.news.model
 
 data class NewsStats(
     val likesQuantity: Int,

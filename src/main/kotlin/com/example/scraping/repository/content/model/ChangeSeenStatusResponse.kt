@@ -1,4 +1,4 @@
-package com.example.scraping.repository.model.content_detail
+package com.example.scraping.repository.content.model
 
 data class ChangeSeenStatusResponse(
     val title: String?

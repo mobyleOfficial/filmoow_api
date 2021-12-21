@@ -1,4 +1,4 @@
-package com.example.scraping.repository.model
+package com.example.scraping.repository.movie.model
 
 data class Movie(
     val id: String,

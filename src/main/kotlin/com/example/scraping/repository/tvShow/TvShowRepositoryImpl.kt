@@ -1,8 +1,8 @@
 package com.example.scraping.repository.tvShow
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.BASE_URL
-import com.example.scraping.repository.model.TvShow
+import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.tvShow.model.TvShow
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

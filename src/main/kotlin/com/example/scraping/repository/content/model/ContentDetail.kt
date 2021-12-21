@@ -1,7 +1,6 @@
-package com.example.scraping.repository.model.content_detail
+package com.example.scraping.repository.content.model
 
-import com.example.scraping.repository.model.Actor
-import com.example.scraping.repository.model.SeenStatus
+import com.example.scraping.repository.common.model.SeenStatus
 
 data class ContentDetail(
     val title: String,

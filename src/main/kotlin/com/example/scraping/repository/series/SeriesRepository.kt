@@ -1,6 +1,6 @@
 package com.example.scraping.repository.series
 
-import com.example.scraping.repository.model.Series
+import com.example.scraping.repository.series.model.Series
 import org.springframework.http.ResponseEntity
 
 interface SeriesRepository {

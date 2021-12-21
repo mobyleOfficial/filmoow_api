@@ -1,8 +1,8 @@
 package com.example.scraping.repository.news
 
-import com.example.scraping.repository.model.BASE_URL
-import com.example.scraping.repository.model.news.News
-import com.example.scraping.repository.model.news.NewsStats
+import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.news.model.News
+import com.example.scraping.repository.news.model.NewsStats
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

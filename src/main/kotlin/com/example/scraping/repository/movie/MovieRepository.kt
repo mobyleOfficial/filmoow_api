@@ -1,6 +1,6 @@
 package com.example.scraping.repository.movie
 
-import com.example.scraping.repository.model.Movie
+import com.example.scraping.repository.movie.model.Movie
 import org.springframework.http.ResponseEntity
 
 interface MovieRepository {

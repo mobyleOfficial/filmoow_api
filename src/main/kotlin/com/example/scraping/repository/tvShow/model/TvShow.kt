@@ -1,4 +1,4 @@
-package com.example.scraping.repository.model
+package com.example.scraping.repository.tvShow.model
 
 data class TvShow(
     val id: String,

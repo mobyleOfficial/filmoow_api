@@ -1,8 +1,8 @@
 package com.example.scraping.repository.movie
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.BASE_URL
-import com.example.scraping.repository.model.Movie
+import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.movie.model.Movie
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

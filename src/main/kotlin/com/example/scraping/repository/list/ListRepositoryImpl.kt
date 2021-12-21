@@ -1,9 +1,9 @@
 package com.example.scraping.repository.list
 
 import com.example.scraping.repository.mappers.statsToInt
-import com.example.scraping.repository.model.BASE_URL
-import com.example.scraping.repository.model.user_listing.ListStats
-import com.example.scraping.repository.model.user_listing.UserListing
+import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.list.model.ListStats
+import com.example.scraping.repository.list.model.UserListing
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

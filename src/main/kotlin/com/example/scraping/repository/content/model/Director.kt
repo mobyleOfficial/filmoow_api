@@ -1,4 +1,4 @@
-package com.example.scraping.repository.model
+package com.example.scraping.repository.content.model
 
 data class Director(
     val id: String,

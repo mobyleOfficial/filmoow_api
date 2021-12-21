@@ -1,6 +1,6 @@
 package com.example.scraping.controller
 
-import com.example.scraping.repository.model.BASE_URL
+import com.example.scraping.repository.common.BASE_URL
 import org.jsoup.Jsoup
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
