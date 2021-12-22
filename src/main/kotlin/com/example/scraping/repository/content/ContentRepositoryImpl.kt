@@ -1,8 +1,9 @@
 package com.example.scraping.repository.content
 
-import com.example.scraping.repository.content.model.Actor
-import com.example.scraping.repository.common.*
+import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.common.ErrorMessage
 import com.example.scraping.repository.common.model.SeenStatus
+import com.example.scraping.repository.content.model.Actor
 import com.example.scraping.repository.content.model.ContentDetail
 import com.example.scraping.repository.content.model.Director
 import com.example.scraping.repository.content.model.RecommendedContent
