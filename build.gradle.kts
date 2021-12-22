@@ -35,9 +35,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = "com.example.scraping.ScrapingApplication"
-    }
+springBoot {
+    mainClass.set("com.example.scraping.ScrapingApplication")
 }
+
