@@ -1,12 +1,13 @@
 package com.example.scraping.controller
 
-import com.example.scraping.repository.list.ListRepositoryImpl
-import com.example.scraping.repository.movie.MovieRepositoryImpl
-import com.example.scraping.repository.news.NewsRepositoryImpl
-import com.example.scraping.repository.series.SeriesRepositoryImpl
-import com.example.scraping.repository.tvShow.TvShowRepositoryImpl
+import com.example.scraping.repository.list.ListRepository
+import com.example.scraping.repository.movie.MovieRepository
+import com.example.scraping.repository.news.NewsRepository
+import com.example.scraping.repository.series.SeriesRepository
+import com.example.scraping.repository.tvShow.TvShowRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -14,41 +15,41 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(value = ["/home"])
 class HomeController {
     @Autowired
-    lateinit var movieRepositoryImpl: MovieRepositoryImpl
+    lateinit var movieRepository: MovieRepository
 
     @Autowired
-    lateinit var  seriesRepositoryImpl: SeriesRepositoryImpl
+    lateinit var  seriesRepository: SeriesRepository
 
     @Autowired
-    lateinit var  tvShowRepositoryImpl: TvShowRepositoryImpl
+    lateinit var  tvShowRepository: TvShowRepository
 
     @Autowired
-    lateinit var  listRepositoryImpl: ListRepositoryImpl
+    lateinit var  listRepository: ListRepository
 
     @Autowired
-    lateinit var  newsRepositoryImpl: NewsRepositoryImpl
+    lateinit var  newsRepository: NewsRepository
 
     @GetMapping(value = ["/popularMovies"])
-    fun getPopularMovies() = movieRepositoryImpl.getPopularMovies(1)
+    fun getPopularMovies(@RequestHeader("Authorization") token: String) = movieRepository.getPopularMovies(1, token)
 
     @GetMapping(value = ["/popularSeries"])
-    fun getPopularSeries() = seriesRepositoryImpl.getPopularSeries(1)
+    fun getPopularSeries(@RequestHeader("Authorization") token: String) = seriesRepository.getPopularSeries(1)
 
     @GetMapping(value = ["/popularTvShow"])
-    fun getPopularTvShow() = tvShowRepositoryImpl.getPopularTvShow(1)
+    fun getPopularTvShow(@RequestHeader("Authorization") token: String) = tvShowRepository.getPopularTvShow(1)
 
     @GetMapping(value = ["/availableCinemaMovies"])
-    fun getAvailableMovies() = movieRepositoryImpl.getAvailableMovies()
+    fun getAvailableMovies(@RequestHeader("Authorization") token: String) = movieRepository.getAvailableMovies(token)
 
     @GetMapping(value = ["/comingSoonMovies"])
-    fun getMoviesComingSoon() = movieRepositoryImpl.getMoviesComingSoon()
+    fun getMoviesComingSoon(@RequestHeader("Authorization") token: String) = movieRepository.getMoviesComingSoon(token)
 
     @GetMapping(value = ["/moviesWeekPremiere"])
-    fun getMoviesWeekPremiere() = movieRepositoryImpl.getMoviesWeekPremiere()
+    fun getMoviesWeekPremiere(@RequestHeader("Authorization") token: String) = movieRepository.getMoviesWeekPremiere(token)
 
     @GetMapping(value = ["/popularLists"])
-    fun getPopularLists() = listRepositoryImpl.getWeekPopularList()
+    fun getPopularLists(@RequestHeader("Authorization") token: String) = listRepository.getWeekPopularList()
 
     @GetMapping(value = ["/news"])
-    fun getNews() = newsRepositoryImpl.getLastNews(1)
+    fun getNews() = newsRepository.getLastNews(1)
 }

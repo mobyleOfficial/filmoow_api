@@ -4,11 +4,11 @@ import com.example.scraping.repository.movie.model.Movie
 import org.springframework.http.ResponseEntity
 
 interface MovieRepository {
-    fun getPopularMovies(page: Int): ResponseEntity<List<Movie>>
+    fun getPopularMovies(page: Int, token: String): ResponseEntity<List<Movie>>
 
-    fun getAvailableMovies(): ResponseEntity<List<Movie>>
+    fun getAvailableMovies(token: String): ResponseEntity<List<Movie>>
 
-    fun getMoviesComingSoon(): ResponseEntity<List<Movie>>
+    fun getMoviesComingSoon(token: String): ResponseEntity<List<Movie>>
 
-    fun getMoviesWeekPremiere(): ResponseEntity<List<Movie>>
+    fun getMoviesWeekPremiere(token: String): ResponseEntity<List<Movie>>
 }

@@ -3,10 +3,15 @@ package com.example.scraping.repository.content
 import com.example.scraping.repository.common.BASE_URL
 import com.example.scraping.repository.common.ErrorMessage
 import com.example.scraping.repository.common.model.SeenStatus
+import com.example.scraping.repository.common.model.User
+import com.example.scraping.repository.common.model.comments.Comment
+import com.example.scraping.repository.common.model.comments.CommentListing
+import com.example.scraping.repository.common.model.comments.CommentStats
 import com.example.scraping.repository.content.model.Actor
 import com.example.scraping.repository.content.model.ContentDetail
 import com.example.scraping.repository.content.model.Director
 import com.example.scraping.repository.content.model.RecommendedContent
+import com.fasterxml.jackson.databind.JsonNode
 import org.jsoup.Jsoup
 import org.springframework.http.*
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -18,13 +23,14 @@ import org.springframework.web.client.RestTemplate
 @Component
 class ContentRepositoryImpl : ContentRepository {
 
-    override fun getMovieDetail(token: String, id: String): ResponseEntity<Any> {
+    override fun getContentDetail(token: String, id: String): ResponseEntity<Any> {
         val coverList = mutableListOf<String>()
         val directorList = mutableListOf<Director>()
         val actorList = mutableListOf<Actor>()
         val recommendedMovieList = mutableListOf<RecommendedContent>()
 
         val webPageMovie = Jsoup.connect("${BASE_URL}/$id")
+            .header("Cache-Control", "max-age=0")
             .cookie(
                 "filmow_sessionid",
                 token
@@ -320,6 +326,132 @@ class ContentRepositoryImpl : ContentRepository {
         } catch (exception: Exception) {
             return ResponseEntity(
                 ErrorMessage("BAD REQUEST", "Could not change status"),
+                HttpStatus.BAD_REQUEST
+            )
+        }
+    }
+
+    override fun getContentComments(id: String, page: Int, token: String): ResponseEntity<Any> {
+        try {
+            val commentList = mutableListOf<Comment>()
+
+            val headers = HttpHeaders()
+            headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+            headers.add(
+                "Cookie",
+                "filmow_sessionid=$token"
+            )
+            headers.add("cache-control", "max-age=0")
+            headers.add("content-Type", "application/json")
+
+            val restTemplate = RestTemplate()
+            restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+
+            val entity: HttpEntity<MultiValueMap<String, String>> =
+                HttpEntity<MultiValueMap<String, String>>(headers)
+
+            val response = restTemplate.exchange(
+                "$BASE_URL/async/comments/?content_type=22&object_pk=$id&user=all&order_by=-created&page=$page",
+                HttpMethod.GET,
+                entity,
+                JsonNode::class.java
+            ).body
+
+            val hasNext = response?.get("pagination")?.get("has_next")?.asText() == "true"
+            val responseBodyHtml = response?.get("html")?.asText()
+            val commentPage = Jsoup.parse(responseBodyHtml)
+
+            if (commentPage.text().contains("Seja o primeiro a comentar")) {
+                return ResponseEntity(
+                    CommentListing(
+                        hasNext,
+                        commentList
+                    ),
+                    HttpStatus.OK
+                )
+            }
+
+            val commentsList = commentPage.getElementsByTag("li")
+
+            repeat(commentsList.size) {
+                val commentComponent = commentsList[it]
+                val commentId = commentComponent.getElementsByClass("age").first().attr("href")
+                val userSection = commentComponent.getElementsByClass("user-name tip-user").first()
+                val commentSection = commentComponent.getElementsByClass("text comment-text")
+                val creationTime = commentComponent.getElementsByClass("age").first().text()
+                val spoilerList = commentSection.first().getElementsByClass("spoiler")
+                    ?.map { spoiler ->
+                        spoiler.text()
+                    }
+                val fullText =
+                    commentSection
+                        .first()
+                        .text()
+                        .replace("Comentário contando partes do filme. Mostrar.", "")
+                        .replace("[spoiler]", "")
+                        .replace("[/spoiler]", "")
+                val userId = userSection.attr("href")
+                val userName = userSection.text()
+                val photoUrl = commentComponent
+                    .getElementsByClass("avatar tip-user")
+                    ?.first()
+                    ?.getElementsByTag("img")
+                    ?.attr("src") ?: ""
+                val likesQuantity = commentComponent.getElementsByTag("button")
+                    ?.first { element ->
+                        element.attr("name") == "like_count"
+                    }?.text()?.toInt() ?: 0
+
+                val rating =
+                    commentComponent.getElementsByClass("tip star-rating star-rating-small stars")
+                        ?.first()
+                        ?.attr("title")
+                        ?.replace("Nota: ", "")
+                        ?.replace(" estrelas", "")
+                        ?.replace(" estrela", "")
+                        ?.toDouble()
+
+                val hasDislike =
+                    commentComponent.getElementsByClass("btn btn-link btn-dislike btn-like-active").size == 1
+
+                val repliesComponent = commentComponent
+                    .getElementsByClass("comments-replies")
+                    ?.first()
+                    ?.getElementsByTag("a")
+                    ?.text()
+                    ?.split(" ")
+                    ?.first()
+
+                val repliesQuantity = if (repliesComponent.isNullOrEmpty()) 0 else
+                    repliesComponent.toInt()
+
+                val hasUserLike =
+                    commentComponent.getElementsByClass("media-footer")
+                        .first()
+                        .getElementsByClass("like-tag")
+                        .first()
+                        .getElementsByTag("button")
+                        .first()
+                        .attr("class") == "btn btn-link btn-like btn-like-active tip-who-liked"
+
+                commentList.add(
+                    Comment(
+                        commentId, User(userId, userName, photoUrl), creationTime, fullText, spoilerList,
+                        CommentStats(rating, likesQuantity, repliesQuantity, hasDislike, hasUserLike)
+                    )
+                )
+            }
+
+            return ResponseEntity(
+                CommentListing(
+                    hasNext,
+                    commentList
+                ),
+                HttpStatus.OK
+            )
+        } catch (exception: Exception) {
+            return ResponseEntity(
+                ErrorMessage("BAD REQUEST", "Could not request list"),
                 HttpStatus.BAD_REQUEST
             )
         }

@@ -14,7 +14,6 @@ data class ContentDetail(
     val releaseYear: Int,
     val seenStatus: SeenStatus,
     val genres: List<String>,
-   // val directors: List<Director>,
     val coverImages: List<String>,
     val actors: List<Actor>,
     val recommendedContent: List<RecommendedContent>

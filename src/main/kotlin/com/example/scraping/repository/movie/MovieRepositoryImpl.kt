@@ -2,6 +2,7 @@ package com.example.scraping.repository.movie
 
 import com.example.scraping.repository.mappers.statsToInt
 import com.example.scraping.repository.common.BASE_URL
+import com.example.scraping.repository.common.model.SeenStatus
 import com.example.scraping.repository.movie.model.Movie
 import org.jsoup.Jsoup
 import org.springframework.http.HttpStatus
@@ -10,9 +11,14 @@ import org.springframework.stereotype.Component
 
 @Component
 class MovieRepositoryImpl : MovieRepository {
-    override fun getPopularMovies(page: Int): ResponseEntity<List<Movie>> {
+    override fun getPopularMovies(page: Int, token: String): ResponseEntity<List<Movie>> {
         val movieList = mutableListOf<Movie>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/populares/filmes/?page=$page")
+            .header("Cache-Control", "max-age=0")
+            .cookie(
+                "filmow_sessionid",
+                token
+            )
             .get()
             .select("li.movie_list_item")
 
@@ -29,7 +35,30 @@ class MovieRepositoryImpl : MovieRepository {
             val commentsQuantity =
                 if (commentsQuantityClass.size == 0) null else commentsQuantityClass.first().text().statsToInt()
 
-            movieList.add(Movie(id, title, image, score, commentsQuantity))
+            val seenStatus = try {
+                val status = movieListItem.getElementsByClass("cover tip-movie ")
+                    ?.first()
+                    ?.getElementsByTag("span")
+                    ?.first()
+                    ?.text()
+
+                when (status) {
+                    "Quero Ver" -> {
+                        SeenStatus.WantToSee
+                    }
+                    "Já Vi" -> {
+                        SeenStatus.Seen
+                    }
+                    else -> {
+                        SeenStatus.NotSeen
+                    }
+                }
+
+            } catch (exception: Exception) {
+                SeenStatus.NotSeen
+            }
+
+            movieList.add(Movie(id, title, image, score, commentsQuantity, seenStatus))
         }
 
         if (movieList.isEmpty()) {
@@ -45,15 +74,20 @@ class MovieRepositoryImpl : MovieRepository {
         )
     }
 
-    override fun getAvailableMovies(): ResponseEntity<List<Movie>> = getMovieList("filmes-nos-cinemas")
+    override fun getAvailableMovies(token: String): ResponseEntity<List<Movie>> = getMovieList("filmes-nos-cinemas", token)
 
-    override fun getMoviesComingSoon(): ResponseEntity<List<Movie>> = getMovieList("filmes-em-breve")
+    override fun getMoviesComingSoon(token: String): ResponseEntity<List<Movie>> = getMovieList("filmes-em-breve", token)
 
-    override fun getMoviesWeekPremiere(): ResponseEntity<List<Movie>> = getMovieList("filmes-estreias")
+    override fun getMoviesWeekPremiere(token: String): ResponseEntity<List<Movie>> = getMovieList("filmes-estreias", token)
 
-    private fun getMovieList(page: String): ResponseEntity<List<Movie>> {
+    private fun getMovieList(page: String, token: String): ResponseEntity<List<Movie>> {
         val movieList = mutableListOf<Movie>()
         val webPageMovieList = Jsoup.connect("${BASE_URL}/$page")
+            .header("Cache-Control", "max-age=0")
+            .cookie(
+                "filmow_sessionid",
+                token
+            )
             .get()
             .select("li.movie_list_item")
 
@@ -70,7 +104,29 @@ class MovieRepositoryImpl : MovieRepository {
             val commentsQuantity =
                 if (commentsQuantityClass.size == 0) null else commentsQuantityClass.first().text().statsToInt()
 
-            movieList.add(Movie(id, title, image, score, commentsQuantity))
+            val seenStatus = try {
+                val status = movieListItem.getElementsByClass("cover tip-movie ")
+                    ?.first()
+                    ?.getElementsByClass("legend sn")
+                    ?.text()
+
+                when (status) {
+                    "Quero Ver" -> {
+                        SeenStatus.WantToSee
+                    }
+                    "Já Vi" -> {
+                        SeenStatus.Seen
+                    }
+                    else -> {
+                        SeenStatus.NotSeen
+                    }
+                }
+
+            } catch (exception: Exception) {
+                SeenStatus.NotSeen
+            }
+
+            movieList.add(Movie(id, title, image, score, commentsQuantity, seenStatus))
         }
 
         if (movieList.isEmpty()) {
