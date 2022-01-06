@@ -8,4 +8,6 @@ interface ContentRepository {
     fun changeContentSeenStatus(token: String, id: String, status: String): ResponseEntity<Any>
 
     fun getContentComments(id: String, page: Int, token: String) : ResponseEntity<Any>
+
+    fun addContentComment(id: String, token: String, message: String) : ResponseEntity<Any>
 }

@@ -341,8 +341,9 @@ class ContentRepositoryImpl : ContentRepository {
                 "Cookie",
                 "filmow_sessionid=$token"
             )
-            headers.add("cache-control", "max-age=0")
-            headers.add("content-Type", "application/json")
+            headers.add("Cache-Control", "max-age=0")
+            headers.add("Sec-Fetch-Mode", "navigate")
+            headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0")
 
             val restTemplate = RestTemplate()
             restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
@@ -455,6 +456,61 @@ class ContentRepositoryImpl : ContentRepository {
                 HttpStatus.BAD_REQUEST
             )
         }
+    }
+
+    override fun addContentComment(id: String, token: String, message: String): ResponseEntity<Any> {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
+        headers.add(
+            "Cookie",
+            "filmow_sessionid=$token"
+        )
+        headers.add("cache-control", "max-age=0")
+        headers.add("content-Type", "application/json")
+        headers.add("Sec-Fetch-Mode", "navigate")
+        headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0")
+
+        val restTemplate = RestTemplate()
+        restTemplate.messageConverters.add(MappingJackson2HttpMessageConverter())
+
+        val map: MultiValueMap<String, String> = LinkedMultiValueMap()
+        map.add("object_pk", id)
+        map.add("content_type_pk", "22")
+        map.add("body", message)
+
+        val entity: HttpEntity<MultiValueMap<String, String>> =
+            HttpEntity<MultiValueMap<String, String>>(map, headers)
+
+        val response = restTemplate.exchange(
+            "$BASE_URL/comentarios/postar/",
+            HttpMethod.POST,
+            entity,
+            String::class.java,
+        )
+
+        val responseText = response.headers["set-cookie"]?.get(0) ?: ""
+        val isLoggedIn = !responseText.contains("precisa estar logado para comentar")
+
+        if (!isLoggedIn) {
+            return ResponseEntity(
+                ErrorMessage("Unauthorized", "User should be logged"),
+                HttpStatus.UNAUTHORIZED,
+            )
+        }
+
+        if (response.hasBody()) {
+            if (response.body?.contains("error") == true) {
+                return ResponseEntity(
+                    ErrorMessage("BAD REQUEST", "Could add the comment"),
+                    HttpStatus.BAD_REQUEST
+                )
+            }
+        }
+
+        return ResponseEntity(
+            message,
+            HttpStatus.OK
+        )
     }
 }
 

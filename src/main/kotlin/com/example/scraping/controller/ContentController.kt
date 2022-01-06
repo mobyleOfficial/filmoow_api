@@ -3,6 +3,7 @@ package com.example.scraping.controller
 import com.example.scraping.repository.content.ContentRepository
 import com.example.scraping.repository.content.ContentRepositoryImpl
 import com.example.scraping.repository.content.model.ChangeSeenStatusRequestBody
+import com.example.scraping.repository.content.model.CommentContent
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -26,4 +27,8 @@ class ContentController {
     @GetMapping(value = ["/comments/{id}"])
     fun getComments(@RequestHeader("Authorization") token: String, @PathVariable id: String, @RequestParam page: Int) =
         repository.getContentComments(id, page, token)
+
+    @PostMapping(value = ["/comments/{id}"])
+    fun addComment(@RequestHeader("Authorization") token: String, @PathVariable id: String, @RequestBody commentContent: CommentContent) =
+        repository.addContentComment(id, token, commentContent.message)
 }
