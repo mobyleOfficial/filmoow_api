@@ -11,6 +11,7 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
+
 repositories {
     mavenCentral()
 }
@@ -38,4 +39,3 @@ tasks.withType<Test> {
 springBoot {
     mainClass.set("com.example.scraping.ScrapingApplication")
 }
-
