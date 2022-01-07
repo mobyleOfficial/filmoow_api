@@ -1,1 +1,1 @@
-web: java -jar build/libs/kotlin-api.jar
+web: java -Dserver.port=$PORT -jar build/libs/com.example-0.0.1-SNAPSHOT.jar
